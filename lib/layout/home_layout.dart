@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sqflite/sqflite.dart';
 import 'package:todo_aplication/modules/archived_tasks/archived_tasks_screen.dart';
 import 'package:todo_aplication/modules/done_tasks/done_tasks_screen.dart';
 
@@ -14,6 +15,11 @@ class _HomeLayoutState extends State<HomeLayout> {
   List<Widget> screens= [NewTasksScreen(),DoneTasksScreen(),ArchivedTasksScreen()];
 
   List<String> screenTitle = ['New','Done','Archived'];
+
+  @override
+  void initState() {
+    CreateDataBase();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -59,6 +65,23 @@ class _HomeLayoutState extends State<HomeLayout> {
         ],
       ),
 
+    );
+  }
+
+  void CreateDataBase() async
+  {
+    var dataBase =await openDatabase(
+      'todoApp.db',
+      version: 1,
+      onCreate: (database,version) {
+        print('Database  Created Successfully');
+        database.execute('CREATE TABLE tasks (id INTEGER PRIMARY KEY, title TEXT, status TEXT, date TEXT, time TEXT)')
+            .then((value) => print('Table Created'))
+            .catchError((err)=> print('Error is ${err.toString()}'));
+      },
+      onOpen: (database){
+        print('Database opened');
+      },
     );
   }
 }
